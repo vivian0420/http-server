@@ -16,16 +16,17 @@ public class InvertedIndex<T> {
         this.index = new HashMap<>();
         this.documentID = new ArrayList<>();
         buildIndex(map);
+
     }
 
-    public void buildIndex(Map<String, List<T>>map) {
+    public void buildIndex(Map<String, List<T>> map) {
         for (Map.Entry<String, List<T>> entry : map.entrySet()) {
             for (T t : entry.getValue()) {
                 documentID.add(t);
                 // reference: https://www.studytonight.com/java-examples/how-to-remove-punctuation-from-string-in-java
                 String[] words = t.toString().toLowerCase().replaceAll("\\p{Punct}", "").split(" ");
                 List<String> wordList = new ArrayList<>();
-                for (String word:words) {
+                for (String word : words) {
                     wordList.add(word);
                 }
                 for (String term : wordList.stream().distinct().toList()) {
@@ -39,6 +40,9 @@ public class InvertedIndex<T> {
                 }
             }
         }
+        for (String key : index.keySet()) {
+            this.index.get(key).sort(Comparator.comparing(e -> -e.getValue()));
+        }
     }
 
     public List<T> search(String term) {
@@ -46,10 +50,8 @@ public class InvertedIndex<T> {
             return null;
         }
 
-        //Sort the Amazon objects that term corresponding to, base on the term frequency, and return the sorted Amazon list
-        List<Map.Entry<Integer, Integer>> entries = this.index.get(term.toLowerCase()).stream().sorted(Map.Entry.comparingByValue()).toList();
         List<T> result = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> entry : entries) {
+        for (Map.Entry<Integer, Integer> entry : index.get(term.toLowerCase())) {
             result.add(documentID.get(entry.getKey()));
         }
         return result;

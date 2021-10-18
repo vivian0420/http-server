@@ -3,74 +3,103 @@ package cs601.project3;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.Serial;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HTTPServer {
 
     private static volatile boolean running = true;
+    private Map<String, Handler> mapping;
+    private ServerSocket serverSocket;
+    private int port;
 
-
-    public static void main(String[] args) {
-
-        ServerSocket serverSocket = null;
-        try{
-            serverSocket = new ServerSocket(8888);
+    public HTTPServer(int port) {
+        this.port = port;
+        this.mapping = new HashMap<>();
+        try {
+            serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        while(running){
+    public void addMapping(String path, Handler handler) {
 
-            try (
-                Socket socket = serverSocket.accept();
-                BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                PrintWriter outputStream = new PrintWriter(socket.getOutputStream(),true);
-            ) {
-                String header = "";
-                String requestLine = inStream.readLine();
-                String line = inStream.readLine();
-                while(line != null && !line.trim().isEmpty()) {
-                    header += line + "\n";
-                    line = inStream.readLine();
+        this.mapping.put(path, handler);
+
+    }
+
+
+    public void startup() {
+
+        new Thread(() -> {
+            while (running) {
+                Socket socket;
+                try {
+                    socket = serverSocket.accept();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    continue;
                 }
-                System.out.println("requestLine: " + requestLine);
-                System.out.println("header: \n" + header);
 
-                String[] requestLineParts = requestLine.split("\\s+");
+                Map<String, String> headers = new HashMap<>();
+                new Thread(() -> {
+                    try (BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                         PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true);) {
 
-                String path = requestLineParts[1];
-                if(!requestLineParts[0].equals("GET") && !requestLineParts[0].equals("POST")){
-                    outputStream.println("HTTP/1.1 405");
-                }
-                outputStream.println("HTTP/1.1 200");
-                outputStream.println("");
+                        String requestLine = inStream.readLine();
+                        String line = inStream.readLine();
+                        while (line != null && !line.trim().isEmpty()) {
+                            if (line.contains(":")) {
+                                headers.put(line.split(":")[0].toLowerCase(), line.split(":")[1]);
+                            }
+                            line = inStream.readLine();
+                        }
 
-                String page = """
-                               <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-                               <html xmlns="http://www.w3.org/1999/xhtml">
-                                 <head>
-                                   <title>Search Application</title>
-                                 </head>
-                                 <body>
-                                  <form action="/reviewsearch" method="post">
-                                    <input type="text" id="search" name="query" value="">
-                                    <input type="submit" value="Search">
-                                  </form>
-                                 </body>
-                               </html>
-                               
-                        """;
-                        outputStream.println(page);
+                        ServerRequest request = new ServerRequest(requestLine, headers, getContent(headers, inStream));
+                        ServerResponse response = new ServerResponse(outputStream);
+                        handleRequest(request, response);
 
-            }catch
-             (IOException e) {
-                e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }).start();
             }
+        }).start();
+
+    }
+
+    public String getContent(Map<String, String> headers, BufferedReader in) {
+        if (!headers.containsKey("content-length")) {
+            return null;
+        }
+        int length = Integer.parseInt(headers.get("content-length").trim());
+        char[] content = new char[length];
+        try {
+            in.read(content, 0, length);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        return new String(content);
+    }
+
+    public void handleRequest(ServerRequest request, ServerResponse response) {
+        if (request.is400()) {
+            response.setCode(400);
+            response.response("400 Bad Request");
+        } else if (request.is405()) {
+            response.setCode(405);
+            response.response("405 Method Not Allowed");
+        } else if (!this.mapping.containsKey(request.getPath())) {
+            response.setCode(404);
+            response.response("404 Not Found");
+        } else {
+            this.mapping.get(request.getPath()).handle(request, response);
         }
 
     }
