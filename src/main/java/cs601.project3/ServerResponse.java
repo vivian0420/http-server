@@ -7,12 +7,12 @@ import java.util.Map;
 public class ServerResponse {
     private int code;
     private PrintWriter output;
-    private Map<String, String> headers;
+    //private Map<String, String> headers;
 
     public ServerResponse(PrintWriter output) {
         this.code = 200;
         this.output = output;
-        this.headers = new HashMap<>();
+        //this.headers = new HashMap<>();
 
     }
 

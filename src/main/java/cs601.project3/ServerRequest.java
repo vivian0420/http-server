@@ -15,17 +15,20 @@ public class ServerRequest {
         this.headers = headers;
         this.content = content;
 
-        String[] requestLineParts = requestLine.split(" ");
-        if (requestLineParts.length == 3) {
-            this.requestMethod = requestLineParts[0];
-            this.path = requestLineParts[1];
-            this.version = requestLineParts[2];
-        } else {
-            this.requestMethod = null;
-            this.path = null;
-            this.version = null;
+        if (requestLine != null) {
+            String[] requestLineParts = requestLine.split(" ");
+            if (requestLineParts.length == 3) {
+                this.requestMethod = requestLineParts[0];
+                this.path = requestLineParts[1];
+                this.version = requestLineParts[2];
+            } else {
+                this.requestMethod = null;
+                this.path = null;
+                this.version = null;
+            }
         }
     }
+
 
     public boolean is400() {
         return this.requestMethod == null || this.path == null || this.version == null;

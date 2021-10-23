@@ -17,47 +17,55 @@ public class FindHandler implements Handler {
     @Override
     public void handle(ServerRequest request, ServerResponse response) {
 
-        String page = """
-                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-                           <html xmlns="http://www.w3.org/1999/xhtml">
-                             <head>
-                               <title>Search Application</title>
-                             </head>
-                             <body>
-                              <form action="/find" method="post">
-                                <input type="text" id="search" name="asin" value="">
-                                <input type="submit" value="Search">
-                              </form>
-                             </body>
-                           </html>
-                """;
+
         if (request.getRequestMethod().equals("GET")) {
-
-            response.response(page);
+            String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin","");
+            response.response(content);
         } else if (request.getRequestMethod().equals("POST")) {
-
-            String asin = request.getContent().split("=")[1];
             StringBuilder result = new StringBuilder();
-            result.append(page);
-            if (!reviewAsinMap.containsKey(asin) && !qaAsinMap.containsKey(asin)) {
-                result.append("<p>").append(asin).append(" is not found").append("</p>");
-                response.response(result.toString());
-            } else {
-                if (reviewAsinMap.containsKey(asin)) {
+            String[] contentParts = request.getContent().split("=");
 
-                    List<Amazon> list = reviewAsinMap.get(asin);
-                    for (Amazon amazon : list) {
-                        result.append("<p>").append(amazon).append("</p>");
+            if (contentParts.length == 1) {
+                String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin","Please enter");
+                response.response(content);
+            } else if (contentParts.length == 2) {
+                String asin = contentParts[1];
+                if (!reviewAsinMap.containsKey(asin) && !qaAsinMap.containsKey(asin)) {
+                    String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin","0 result showed");
+                    response.response(content);
+                } else {
+                    List<Amazon> reviewList = reviewAsinMap.get(asin);
+                    List<Amazon> qaList = qaAsinMap.get(asin);
+
+                    if (reviewList != null && qaList == null) {
+                        result.append("<p>").append(reviewList.size()).append(" result(s) showed").append("</p>");
+                        for (Amazon amazon : reviewList) {
+                            result.append("<p>").append(amazon).append("</p>");
+                        }
+                        String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin", result.toString());
+                        response.response(content);
                     }
-                    response.response(result.toString());
-                }
-                if (qaAsinMap.containsKey(asin)) {
-                    List<Amazon> list = qaAsinMap.get(asin);
-                    for (Amazon amazon : list) {
-                        result.append("<p>").append(amazon).append("</p>");
+                    else if (reviewList == null && qaList != null) {
+                        result.append("<p>").append(qaList.size()).append(" result(s) showed").append("</p>");
+                        for (Amazon amazon : qaList) {
+                            result.append("<p>").append(amazon).append("</p>");
+                        }
+                        String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin", result.toString());
+                        response.response(content);
+                    }
+                    else {
+                        result.append("<p>").append(reviewList.size() + qaList.size()).append(" result(s) showed").append("</p>");
+                        for (Amazon amazon : reviewList) {
+                            result.append("<p>").append(amazon).append("</p>");
+                        }
+                        for (Amazon amazon : qaList) {
+                            result.append("<p>").append(amazon).append("</p>");
+                        }
+                        String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin",result.toString());
+                        response.response(content);
+
                     }
                 }
-                response.response(result.toString());
             }
         }
     }

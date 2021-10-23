@@ -17,41 +17,40 @@ public class ReviewSearchHandler implements Handler {
     @Override
     public void handle(ServerRequest request, ServerResponse response) {
 
-        String page = """
-                       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-                       <html xmlns="http://www.w3.org/1999/xhtml">
-                         <head>
-                           <title>Search Application</title>
-                         </head>
-                         <body>
-                          <form action="/reviewsearch" method="post">
-                            <input type="text" id="search" name="query" value="">
-                            <input type="submit" value="Search">
-                          </form>
-                         </body>
-                       </html>
-                       
-                """;
         if (request.getRequestMethod().equals("GET")) {
+            String content = new GetApplicationHTML().GetApplicationHTML("reviewsearch", "/reviewsearch",
+                                                                         "query", "");
+            response.response(content);
 
-            response.response(page);
         } else if (request.getRequestMethod().equals("POST")) {
-            String term = request.getContent().split("=")[1];
-            List<AmazonReview> list = index.search(term);
+
+            String[] contentParts = request.getContent().split("=");
             StringBuilder result = new StringBuilder();
-            if (list != null) {
-                result.append(page);
-                for (AmazonReview review : list) {
-                    result.append("<p>").append(review).append("</p>");
+            if (contentParts.length == 1) {
+                String content = new GetApplicationHTML().GetApplicationHTML("reviewsearch", "/reviewsearch",
+                        "query", "Please enter");
+                response.response(content);
+
+            } else if (contentParts.length == 2) {
+                String term = contentParts[1];
+                List<AmazonReview> list = index.search(term);
+                if (list != null) {
+
+                    result.append("<p>").append(list.size()).append(" result(s) showed").append("</p>");
+                    for (AmazonReview review : list) {
+                        result.append("<p>").append(review).append("</p>");
+                    }
+                    String content = new GetApplicationHTML().GetApplicationHTML("reviewsearch", "/reviewsearch",
+                            "query", result.toString());
+                    response.response(content);
+
+                } else {
+                    result.append("<p>").append(term).append(" is not found").append("</p");
+                    String content = new GetApplicationHTML().GetApplicationHTML("reviewsearch", "/reviewsearch",
+                            "query", result.toString());
+                    response.response(content);
                 }
-                response.response(result.toString());
-            } else {
-                result.append("<p>").append(page).append(term).append(" is not found").append("</p");
-                response.response(result.toString());
             }
-
         }
-
-
     }
 }

@@ -58,15 +58,16 @@ public class HTTPServer {
                             }
                             line = inStream.readLine();
                         }
-
                         ServerRequest request = new ServerRequest(requestLine, headers, getContent(headers, inStream));
                         ServerResponse response = new ServerResponse(outputStream);
                         handleRequest(request, response);
+                        inStream.close();
+                        outputStream.close();
+                        socket.close();
 
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
                 }).start();
             }
         }).start();
