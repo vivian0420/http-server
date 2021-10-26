@@ -6,6 +6,7 @@ package cs601.project3;
 public class AmazonReview extends Amazon {
     private String reviewText;
 
+
     /**
      * reviewText getter method
      *
@@ -16,18 +17,8 @@ public class AmazonReview extends Amazon {
         if (this.reviewText == null) {
             return "";
         }
-        return this.reviewText;
+        return "AmazonReview: Asin= " + super.getAsin() + " " + this.reviewText;
     }
 
-    /**
-     * set up the format for review output.
-     *
-     * @return the format for output
-     */
-    public String text() {
-        return "AmazonReview{" +
-                "Asin='" + super.getAsin() + "'" +
-                ", reviewText='" + this.reviewText + "'" +
-                '}';
-    }
+
 }

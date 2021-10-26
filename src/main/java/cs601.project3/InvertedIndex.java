@@ -7,11 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ * @param <T>
+ */
 public class InvertedIndex<T> {
 
-    private List<T> documentID;
+    private final List<T> documentID;
     private final Map<String, List<Map.Entry<Integer, Integer>>> index;
 
+    /**
+     *
+     * @param map
+     */
     public InvertedIndex(Map<String, List<T>> map) {
         this.index = new HashMap<>();
         this.documentID = new ArrayList<>();
@@ -19,6 +27,10 @@ public class InvertedIndex<T> {
 
     }
 
+    /**
+     *
+     * @param map
+     */
     public void buildIndex(Map<String, List<T>> map) {
         for (Map.Entry<String, List<T>> entry : map.entrySet()) {
             for (T t : entry.getValue()) {
@@ -26,9 +38,7 @@ public class InvertedIndex<T> {
                 // reference: https://www.studytonight.com/java-examples/how-to-remove-punctuation-from-string-in-java
                 String[] words = t.toString().toLowerCase().replaceAll("\\p{Punct}", "").split(" ");
                 List<String> wordList = new ArrayList<>();
-                for (String word : words) {
-                    wordList.add(word);
-                }
+                Collections.addAll(wordList, words);
                 for (String term : wordList.stream().distinct().toList()) {
                     if (term.isEmpty() || term.isBlank()) {
                         continue;
@@ -45,6 +55,11 @@ public class InvertedIndex<T> {
         }
     }
 
+    /**
+     *
+     * @param term
+     * @return
+     */
     public List<T> search(String term) {
         if (!this.index.containsKey(term.toLowerCase())) {
             return null;

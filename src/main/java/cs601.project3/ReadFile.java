@@ -1,7 +1,6 @@
 package cs601.project3;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *
+ */
 public class ReadFile {
     private final String arg;
 
@@ -20,6 +22,11 @@ public class ReadFile {
         this.arg = arg;
     }
 
+    /**
+     *
+     * @param amazonClass
+     * @return
+     */
     public Map<String, List<Amazon>> readFile(Class<? extends Amazon> amazonClass) {
 
         Map<String, List<Amazon>> asinMap = new HashMap<>();

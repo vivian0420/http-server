@@ -1,12 +1,19 @@
 package cs601.project3;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * FindHandler class. Handle requests and make responses
+ */
 public class FindHandler implements Handler {
-    private Map<String, List<Amazon>> reviewAsinMap;
-    private Map<String, List<Amazon>> qaAsinMap;
+    private final Map<String, List<Amazon>> reviewAsinMap;
+    private final Map<String, List<Amazon>> qaAsinMap;
 
+    /**
+     * Constructor. Read files and build asin hashmaps.
+     */
     public FindHandler() {
 
         reviewAsinMap = new ReadFile("reviews_Cell_Phones_and_Accessories_5.json").readFile(AmazonReview.class);
@@ -14,24 +21,32 @@ public class FindHandler implements Handler {
     }
 
 
+    /**
+     * Respond based on the requests.
+     * @param request client requests
+     * @param response an instance of ServerResponse
+     */
     @Override
     public void handle(ServerRequest request, ServerResponse response) {
 
-
+        //If the request method is "GET", return a web page containing(a text box and a button)
         if (request.getRequestMethod().equals("GET")) {
-            String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin","");
+            String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin","");
             response.response(content);
-        } else if (request.getRequestMethod().equals("POST")) {
+        }
+
+        //If the request method is "POST", then make response based on the content
+        else if (request.getRequestMethod().equals("POST")) {
             StringBuilder result = new StringBuilder();
             String[] contentParts = request.getContent().split("=");
 
             if (contentParts.length == 1) {
-                String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin","Please enter");
+                String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin","Please enter");
                 response.response(content);
             } else if (contentParts.length == 2) {
                 String asin = contentParts[1];
                 if (!reviewAsinMap.containsKey(asin) && !qaAsinMap.containsKey(asin)) {
-                    String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin","0 result showed");
+                    String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin","0 result showed");
                     response.response(content);
                 } else {
                     List<Amazon> reviewList = reviewAsinMap.get(asin);
@@ -42,7 +57,7 @@ public class FindHandler implements Handler {
                         for (Amazon amazon : reviewList) {
                             result.append("<p>").append(amazon).append("</p>");
                         }
-                        String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin", result.toString());
+                        String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", result.toString());
                         response.response(content);
                     }
                     else if (reviewList == null && qaList != null) {
@@ -50,7 +65,7 @@ public class FindHandler implements Handler {
                         for (Amazon amazon : qaList) {
                             result.append("<p>").append(amazon).append("</p>");
                         }
-                        String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin", result.toString());
+                        String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", result.toString());
                         response.response(content);
                     }
                     else {
@@ -61,7 +76,7 @@ public class FindHandler implements Handler {
                         for (Amazon amazon : qaList) {
                             result.append("<p>").append(amazon).append("</p>");
                         }
-                        String content = new GetApplicationHTML().GetApplicationHTML("find", "/find", "asin",result.toString());
+                        String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin",result.toString());
                         response.response(content);
 
                     }

@@ -9,6 +9,10 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * HTTPServer class
+ */
 public class HTTPServer {
 
     private static volatile boolean running = true;
@@ -16,6 +20,10 @@ public class HTTPServer {
     private ServerSocket serverSocket;
     private int port;
 
+    /**
+     * Constructor. Specify the the number of port and create serverSocket and a HashMap of mapping.
+     * @param port the number of port that we will listen to
+     */
     public HTTPServer(int port) {
         this.port = port;
         this.mapping = new HashMap<>();
@@ -26,6 +34,11 @@ public class HTTPServer {
         }
     }
 
+    /**
+     * Add request path and handler to mapping
+     * @param path request path
+     * @param handler instance of Handler
+     */
     public void addMapping(String path, Handler handler) {
 
         this.mapping.put(path, handler);
@@ -33,8 +46,11 @@ public class HTTPServer {
     }
 
 
+    /**
+     * Start the server to serve HTTP requests.
+     */
     public void startup() {
-
+        // start a new thread to unblock the main function
         new Thread(() -> {
             while (running) {
                 Socket socket;
@@ -44,12 +60,11 @@ public class HTTPServer {
                     e.printStackTrace();
                     continue;
                 }
-
-                Map<String, String> headers = new HashMap<>();
+                // start a new thread to handle each socket so that "Each incoming request will be handled by a different thread."
                 new Thread(() -> {
                     try (BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                          PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true);) {
-
+                        Map<String, String> headers = new HashMap<>();
                         String requestLine = inStream.readLine();
                         String line = inStream.readLine();
                         while (line != null && !line.trim().isEmpty()) {
@@ -64,17 +79,21 @@ public class HTTPServer {
                         inStream.close();
                         outputStream.close();
                         socket.close();
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }).start();
             }
         }).start();
-
     }
 
-    public String getContent(Map<String, String> headers, BufferedReader in) {
+    /**
+     * Get HTTP post content
+     * @param headers HTTP header
+     * @param in BufferedReader
+     * @return post content
+     */
+    private String getContent(Map<String, String> headers, BufferedReader in) {
         if (!headers.containsKey("content-length")) {
             return null;
         }
@@ -89,6 +108,11 @@ public class HTTPServer {
         return new String(content);
     }
 
+    /**
+     * Handle HTTP requests
+     * @param request The HTTP request that the server receives
+     * @param response The HTTP response that the server sends
+     */
     public void handleRequest(ServerRequest request, ServerResponse response) {
         if (request.is400()) {
             response.setCode(400);

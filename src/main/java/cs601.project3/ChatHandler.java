@@ -1,28 +1,38 @@
 package cs601.project3;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * ChatHandler class. Handle requests and make responses
+ */
 public class ChatHandler implements Handler{
+
+    /**
+     * Respond based on the requests.
+     * @param request the request that the server received
+     * @param response instance of ServerResponse
+     */
     @Override
     public void handle(ServerRequest request, ServerResponse response) {
 
+        //If the request method is "GET", return a web page containing(a text box and a button)
         if (request.getRequestMethod().equals("GET")) {
-            String content = new GetApplicationHTML().GetApplicationHTML("Chat", "/slackbot",
+            String content = GetApplicationHTML.getApplicationHTML("Chat", "/slackbot",
                     "message", "");
             response.response(content);
+        }
 
-        } else if (request.getRequestMethod().equals("POST")) {
+        //If the request method is "POST", prepare a JsonObject for posting to Slack. Then create a client, send the
+        // JsonObject to Slack and handle the message the Slack sends back.
+        else if (request.getRequestMethod().equals("POST")) {
 
             String postTerm = getTerm(request.getContent());
             if (postTerm != null) {
@@ -40,14 +50,18 @@ public class ChatHandler implements Handler{
                         .build();
                 client.sendAsync(slackRequest, HttpResponse.BodyHandlers.ofString())
                         .thenApply(HttpResponse::body)
-                        .thenAccept(r -> response.response(new GetApplicationHTML().GetApplicationHTML("Chat", "/slackbot",
-                                "message","<pre>" + new GsonBuilder().setPrettyPrinting()
-                                .create().toJson(new Gson().fromJson(r, JsonObject.class) + "</pre>"))))
+                        .thenAccept(r -> response.response(GetApplicationHTML.getApplicationHTML("Chat", "/slackbot",
+                                "message",r)))
                         .join();
             }
-        }
+         }
     }
 
+    /**
+     * Get the term that users want to post
+     * @param content The content posted by the browser.
+     * @return the term that users want to post
+     */
     public String getTerm(String content) {
         try {
             String[] split = URLDecoder.decode(content, StandardCharsets.UTF_8.name()).split("=");

@@ -11,6 +11,7 @@ public class AmazonQA extends Amazon {
     private String question;
     private String answer;
 
+
     /**
      * QA text getter method
      *
@@ -23,25 +24,12 @@ public class AmazonQA extends Amazon {
             return "";
         }
         if (this.question == null) {
-            return this.answer;
+            return "AmazonQA: Asin='" + super.getAsin() + " " + this.answer;
         }
         if (this.answer == null) {
-            return this.question;
+            return "AmazonQA: Asin='" + super.getAsin() + " " + this.question;
         }
-        return this.question + " " + this.answer;
+        return "AmazonQA: Asin='" + super.getAsin() + " "  + this.question + " " + this.answer;
     }
 
-    /**
-     * set up the format for QA output.
-     *
-     * @return the format for output
-     */
-
-    public String text() {
-        return "AmazonQA{" +
-                "Asin='" + super.getAsin() + "'" +
-                ", question='" + this.question + '\'' +
-                ", answer='" + this.answer + '\'' +
-                '}';
-    }
 }
