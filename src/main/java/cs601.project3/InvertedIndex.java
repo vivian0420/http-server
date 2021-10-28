@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- * @param <T>
+ * Building inverted index,and support searching
+ * @param <T> generic type of object
  */
 public class InvertedIndex<T> {
 
@@ -17,8 +17,8 @@ public class InvertedIndex<T> {
     private final Map<String, List<Map.Entry<Integer, Integer>>> index;
 
     /**
-     *
-     * @param map
+     * constructor, build inverted index
+     * @param map reviewAsin or qaAsin HashMap
      */
     public InvertedIndex(Map<String, List<T>> map) {
         this.index = new HashMap<>();
@@ -28,8 +28,8 @@ public class InvertedIndex<T> {
     }
 
     /**
-     *
-     * @param map
+     * build index for each single word
+     * @param map reviewAsin or qaAsin HashMap
      */
     public void buildIndex(Map<String, List<T>> map) {
         for (Map.Entry<String, List<T>> entry : map.entrySet()) {
@@ -56,9 +56,9 @@ public class InvertedIndex<T> {
     }
 
     /**
-     *
-     * @param term
-     * @return
+     * Return a list that contains all the objects that including search term
+     * @param term the word that users want to search
+     * @return a list that contains all Amazon objects that the term corresponding to
      */
     public List<T> search(String term) {
         if (!this.index.containsKey(term.toLowerCase())) {

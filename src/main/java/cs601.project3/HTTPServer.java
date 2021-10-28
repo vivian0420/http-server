@@ -1,5 +1,8 @@
 package cs601.project3;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,8 +17,9 @@ import java.util.Map;
  * HTTPServer class
  */
 public class HTTPServer {
+    private static final Logger LOGGER = LogManager.getLogger(HTTPServer.class.getName());
 
-    private static volatile boolean running = true;
+    private volatile boolean running = true;
     private Map<String, Handler> mapping;
     private ServerSocket serverSocket;
     private int port;
@@ -45,7 +49,6 @@ public class HTTPServer {
 
     }
 
-
     /**
      * Start the server to serve HTTP requests.
      */
@@ -57,7 +60,7 @@ public class HTTPServer {
                 try {
                     socket = serverSocket.accept();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    LOGGER.warn("Can't accept client socket.");
                     continue;
                 }
                 // start a new thread to handle each socket so that "Each incoming request will be handled by a different thread."
@@ -66,6 +69,10 @@ public class HTTPServer {
                          PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true);) {
                         Map<String, String> headers = new HashMap<>();
                         String requestLine = inStream.readLine();
+                        if(requestLine.equals("SHUTDOWN_THIS_SERVER")) {
+                            this.shutDown();
+                            return;
+                        }
                         String line = inStream.readLine();
                         while (line != null && !line.trim().isEmpty()) {
                             if (line.contains(":")) {
@@ -80,11 +87,12 @@ public class HTTPServer {
                         outputStream.close();
                         socket.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOGGER.error("Error handing HTTP request.", e);
                     }
                 }).start();
             }
         }).start();
+        LOGGER.info("Server started at http://localhost:" + this.port);
     }
 
     /**
@@ -102,7 +110,7 @@ public class HTTPServer {
         try {
             in.read(content, 0, length);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Couldn't get the content", e);
             return null;
         }
         return new String(content);
@@ -116,17 +124,29 @@ public class HTTPServer {
     public void handleRequest(ServerRequest request, ServerResponse response) {
         if (request.is400()) {
             response.setCode(400);
-            response.response("400 Bad Request");
+            response.response("<html>400 Bad Request</html>");
         } else if (request.is405()) {
             response.setCode(405);
-            response.response("405 Method Not Allowed");
+            response.response("<html>405 Method Not Allowed</html>");
         } else if (!this.mapping.containsKey(request.getPath())) {
             response.setCode(404);
-            response.response("404 Not Found");
+            response.response("<html>404 Not Found</html>");
         } else {
             this.mapping.get(request.getPath()).handle(request, response);
         }
 
+    }
+
+    /**
+     * Shutdown method. set up running as false and close the server socket.
+     */
+    public void shutDown() {
+        this.running = false;
+        try{
+            this.serverSocket.close();
+        } catch (IOException e) {
+            LOGGER.error("Unable to close the server socket.", e);
+        }
     }
 
 }

@@ -1,6 +1,8 @@
 package cs601.project3;
 
 import com.google.gson.JsonObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -14,6 +16,7 @@ import java.nio.charset.StandardCharsets;
  * ChatHandler class. Handle requests and make responses
  */
 public class ChatHandler implements Handler{
+    private static final Logger LOGGER = LogManager.getLogger(ChatHandler.class.getName());
 
     /**
      * Respond based on the requests.
@@ -38,13 +41,13 @@ public class ChatHandler implements Handler{
             if (postTerm != null) {
 
                 JsonObject object = new JsonObject();
-                object.addProperty("channel", "C02HW1RJ5JR");
+                object.addProperty("channel", "C02EBVCT3HA");
                 object.addProperty("text", postTerm);
 
 
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest slackRequest = HttpRequest.newBuilder().uri(URI.create("https://slack.com/api/chat.postMessage"))
-                        .header("Authorization", "Bearer xoxb-2611054740403-2616894378805-xvfMuItdSeRlyGqCI3q8ARaz")
+                        .header("Authorization", "Bearer xoxb-2376352929024-2613023366566-mqhfe4VYayx8ARMGy7ZpXI84")
                         .header("Content-Type", "application/json; utf-8")
                         .POST(HttpRequest.BodyPublishers.ofString(object.toString()))
                         .build();
@@ -73,7 +76,7 @@ public class ChatHandler implements Handler{
             }
         }
         catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            LOGGER.error("Unsupported Encoding.", e);
             return null;
         }
     }

@@ -16,7 +16,7 @@ public class HTTPServerTest {
     public static void startTheServer() {
         server = new HTTPServer(8088);
         server.addMapping("/find", new FindHandler());
-        server.addMapping("/reviewSearch", new FindHandler());
+        server.addMapping("/reviewSearch", new ReviewSearchHandler());
         server.startup();
     }
 

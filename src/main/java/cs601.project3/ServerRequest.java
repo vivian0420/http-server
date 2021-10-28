@@ -7,6 +7,7 @@ import java.util.Map;
  *
  */
 public class ServerRequest {
+
     private String requestLine;
     private Map<String, String> headers;
     private String content;
@@ -15,10 +16,10 @@ public class ServerRequest {
     private String version;
 
     /**
-     *
-     * @param requestLine
-     * @param headers
-     * @param content
+     * Constructor. Parse request line
+     * @param requestLine HTTP request line, for example: GET /find HTTP/1.1
+     * @param headers HTTP headers
+     * @param content HTTP post content
      */
     public ServerRequest(String requestLine, Map<String, String> headers, String content) {
         this.requestLine = requestLine;
@@ -41,8 +42,8 @@ public class ServerRequest {
 
 
     /**
-     *
-     * @return
+     * check if a request is bad request or not.
+     * @return return true if the request line is bad request,and vice versa
      */
     public boolean is400() {
         String[] validMethods = {"GET", "POST", "PUT", "HEAD", "OPTIONS", "DELETE", "CONNECT", "PATCH", "TRACE"};
@@ -51,32 +52,32 @@ public class ServerRequest {
     }
 
     /**
-     *
-     * @return
+     * check if a request method is allowed or not.
+     * @return return true if the request method is not allowed,and vice versa
      */
     public boolean is405() {
         return !this.requestMethod.equals("GET") && !this.requestMethod.equals("POST") ;
     }
 
     /**
-     *
-     * @return
+     * getter method
+     * @return post content
      */
     public String getContent() {
         return this.content;
     }
 
     /**
-     *
-     * @return
+     * getter method
+     * @return request path
      */
     public String getPath() {
         return this.path;
     }
 
     /**
-     *
-     * @return
+     * getter method
+     * @return request method
      */
     public String getRequestMethod() {
         return this.requestMethod;

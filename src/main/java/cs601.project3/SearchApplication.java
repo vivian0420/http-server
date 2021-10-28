@@ -2,10 +2,6 @@ package cs601.project3;
 
 public class SearchApplication {
 
-    /**
-     *
-     * @param args
-     */
     public static void main(String[] args) {
         int port = 1024;
         HTTPServer server = new HTTPServer(port);

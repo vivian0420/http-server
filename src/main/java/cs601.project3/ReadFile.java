@@ -1,6 +1,8 @@
 package cs601.project3;
 
 import com.google.gson.Gson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,24 +15,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Read file and build "asin-Amazon object list" HashMap
  */
 public class ReadFile {
-    private final String arg;
 
-    public ReadFile(String arg) {
-        this.arg = arg;
+    private static final Logger LOGGER = LogManager.getLogger(ReadFile.class.getName());
+
+    private final String path;
+
+    //file path
+    public ReadFile(String path) {
+        this.path = path;
     }
 
     /**
-     *
-     * @param amazonClass
-     * @return
+     * Read file and convert each line to AmazonObject then store in the HashMap
+     * @param amazonClass a class that extends from Amazon
+     * @return a hashmap that contains all asin and their corresponding Amazon object
      */
     public Map<String, List<Amazon>> readFile(Class<? extends Amazon> amazonClass) {
 
         Map<String, List<Amazon>> asinMap = new HashMap<>();
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(arg), StandardCharsets.ISO_8859_1)) {
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(path), StandardCharsets.ISO_8859_1)) {
             String line = "";
             while ((line = br.readLine()) != null) {
                 Gson gson = new Gson();
@@ -38,6 +44,7 @@ public class ReadFile {
                 try {
                     amazonObject = gson.fromJson(line, amazonClass);
                 } catch (RuntimeException e) {
+                    LOGGER.error("Rumtime exception.", e);
                     continue;
                 }
                 if (amazonObject == null) {
@@ -53,8 +60,8 @@ public class ReadFile {
 
             }
         } catch (IOException e) {
-            System.out.println("File " + arg + " can't be found!");
-            System.exit(1);
+            LOGGER.error("File " + path + " can't be found!", e);
+
         }
         return asinMap;
     }

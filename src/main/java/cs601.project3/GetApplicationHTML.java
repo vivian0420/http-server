@@ -6,7 +6,7 @@ package cs601.project3;
 public class GetApplicationHTML {
 
     /**
-     *
+     * Get application HTML for responding
      * @param applicationName  name of application,like find, reviewsearch
      * @param actionPath HTTP request path
      * @param name name of input, like asin, query, message
