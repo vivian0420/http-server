@@ -148,5 +148,6 @@ public class SearchApplicationTest {
                     assertTrue(r.body().contains("<title>find Application</title>"));
 
                 }).join();
+
     }
 }

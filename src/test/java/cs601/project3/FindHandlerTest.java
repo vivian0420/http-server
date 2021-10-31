@@ -72,4 +72,14 @@ public class FindHandlerTest {
         assertTrue(writer.toString().contains("Please enter"));
     }
 
+    @Test
+    public void testHandleMethod5() {
+        ServerRequest request = new ServerRequest("POST /find HTTP/1.1", null, "asin1=3998899561");
+        StringWriter writer = new StringWriter();
+        PrintWriter out = new PrintWriter(writer);
+        ServerResponse response = new ServerResponse(out);
+        find.handle(request, response);
+        assertTrue(writer.toString().startsWith("HTTP/1.1 400"));
+        assertTrue(writer.toString().contains("400 Bad Request"));
+    }
 }

@@ -60,13 +60,25 @@ public class ChatHandleTest {
     }
 
     @Test
+    public void testHandlePost3() {
+        ServerRequest request = new ServerRequest("POST /slackbot HTTP/1.1", null, "message1=");
+        StringWriter writer = new StringWriter();
+        PrintWriter out = new PrintWriter(writer);
+        ServerResponse response = new ServerResponse(out);
+        chat.handle(request, response);
+        assertTrue(writer.toString().startsWith("HTTP/1.1 400"));
+        assertTrue(writer.toString().contains("400 Bad Request"));
+    }
+
+    @Test
     public void testGetTerm() {
         ServerRequest request = new ServerRequest("POST /slackbot HTTP/1.1", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
         ServerResponse response = new ServerResponse(out);
         chat.handle(request, response);
-        assertEquals("", chat.getTerm(request.getContent()));
+        assertTrue(writer.toString().startsWith("HTTP/1.1 400"));
+        assertTrue(writer.toString().contains("400 Bad Request"));
     }
 
 

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- *
+ * Parse request line
  */
 public class ServerRequest {
 
@@ -82,4 +82,6 @@ public class ServerRequest {
     public String getRequestMethod() {
         return this.requestMethod;
     }
+
+
 }

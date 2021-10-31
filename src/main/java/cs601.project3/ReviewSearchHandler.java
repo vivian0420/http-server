@@ -38,7 +38,8 @@ public class ReviewSearchHandler implements Handler {
 
     /**
      * Respond based on the requests.
-     * @param request the request that the server received
+     *
+     * @param request  the request that the server received
      * @param response instance of ServerResponse
      */
     @Override
@@ -47,7 +48,7 @@ public class ReviewSearchHandler implements Handler {
         //If the request method is "GET", return a web page containing(a text box and a button)
         if (request.getRequestMethod().equals("GET")) {
             String content = GetApplicationHTML.getApplicationHTML("reviewsearch", "/reviewsearch",
-                                                                         "query", "");
+                    "query", "");
             response.response(content);
         }
 
@@ -61,7 +62,13 @@ public class ReviewSearchHandler implements Handler {
             String[] contentParts = request.getContent().split("=");
             StringBuilder result = new StringBuilder();
             //If search term is missing, prompt users to enter what they want to search.
-            if (contentParts.length == 1) {
+            if(!contentParts[0].equals("query"))
+            {
+                response.setCode(400);
+                response.response("<html>400 Bad Request</html>");
+                return;
+            }
+            else if (contentParts.length == 1) {
                 String content = GetApplicationHTML.getApplicationHTML("reviewsearch", "/reviewsearch",
                         "query", "Please enter");
                 response.response(content);

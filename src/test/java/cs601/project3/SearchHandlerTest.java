@@ -69,4 +69,15 @@ public class SearchHandlerTest {
         assertTrue(writer.toString().contains("<title>reviewsearch Application</title>"));
         assertTrue(writer.toString().contains("Please enter"));
     }
+
+    @Test
+    public void testHandlePost4() {
+        ServerRequest request = new ServerRequest("POST /reviewsearch HTTP/1.1", null, "query1=");
+        StringWriter writer = new StringWriter();
+        PrintWriter out = new PrintWriter(writer);
+        ServerResponse response = new ServerResponse(out);
+        search.handle(request, response);
+        assertTrue(writer.toString().startsWith("HTTP/1.1 400"));
+        assertTrue(writer.toString().contains("400 Bad Request"));
+    }
 }

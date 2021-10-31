@@ -3,7 +3,7 @@ package cs601.project3;
 public class SearchApplication {
 
     public static void main(String[] args) {
-        int port = 1024;
+        int port = 8080;
         HTTPServer server = new HTTPServer(port);
         //The request GET /reviewsearch will be dispatched to the
         //handle method of the ReviewSearchHandler.

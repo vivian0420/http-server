@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: cs601.project3.SearchApplication
+Multi-Release: true
+

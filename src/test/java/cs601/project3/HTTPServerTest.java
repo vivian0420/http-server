@@ -67,7 +67,7 @@ public class HTTPServerTest {
         PrintWriter out = new PrintWriter(writer);
         ServerResponse response = new ServerResponse(out);
         server.handleRequest(request, response);
-        assertTrue(writer.toString().contains("HTTP/1.1 200"));
+        assertTrue(writer.toString().contains("HTTP/1.1 400"));
     }
 
 }

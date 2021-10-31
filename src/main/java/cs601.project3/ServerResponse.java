@@ -17,6 +17,7 @@ public class ServerResponse {
 
     /**
      * Set response code
+     *
      * @param code The response code that we want to respond to user
      */
     public void setCode(int code) {
@@ -25,6 +26,7 @@ public class ServerResponse {
 
     /**
      * Response for user request
+     *
      * @param content the content that we want to respond to user based on user request
      */
     public void response(String content) {

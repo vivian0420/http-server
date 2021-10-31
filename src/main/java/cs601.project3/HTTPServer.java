@@ -66,10 +66,10 @@ public class HTTPServer {
                 // start a new thread to handle each socket so that "Each incoming request will be handled by a different thread."
                 new Thread(() -> {
                     try (BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                         PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true);) {
+                         PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true)) {
                         Map<String, String> headers = new HashMap<>();
                         String requestLine = inStream.readLine();
-                        if(requestLine.equals("SHUTDOWN_THIS_SERVER")) {
+                        if(requestLine != null && requestLine.equals("SHUTDOWN_THIS_SERVER")) {
                             this.shutDown();
                             return;
                         }
@@ -132,7 +132,16 @@ public class HTTPServer {
             response.setCode(404);
             response.response("<html>404 Not Found</html>");
         } else {
-            this.mapping.get(request.getPath()).handle(request, response);
+            try{
+                this.mapping.get(request.getPath()).handle(request, response);
+            } catch (Exception e) {
+                LOGGER.error("500 Internal Server Error", e);
+                response.setCode(500);
+                response.response("<html>500 Internal Server Error</html>");
+
+            }
+
+
         }
 
     }

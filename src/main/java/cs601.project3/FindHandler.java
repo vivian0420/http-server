@@ -66,10 +66,16 @@ public class FindHandler implements Handler {
             }
             String[] contentParts = request.getContent().split("=");
 
-            if (contentParts.length == 1) {
+            if(!contentParts[0].equals("asin")) {
+                response.setCode(400);
+                response.response("<html>400 Bad Request</html>");
+                return;
+            }
+            else if (contentParts.length == 1) {
                 String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", "Please enter");
                 response.response(content);
             } else if (contentParts.length == 2) {
+
                 String asin = contentParts[1];
                 if (!reviewAsinMap.containsKey(asin) && !qaAsinMap.containsKey(asin)) {
                     String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", "0 result showed");
