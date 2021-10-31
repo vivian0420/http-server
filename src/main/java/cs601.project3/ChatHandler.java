@@ -53,7 +53,7 @@ public class ChatHandler implements Handler {
             if (postTerm != null) {
 
                 JsonObject object = new JsonObject();
-                object.addProperty("channel", "C02HW1RJ5JR");
+                object.addProperty("channel", "C02EBVCT3HA");
                 object.addProperty("text", postTerm);
 
                 String line = "";
