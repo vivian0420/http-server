@@ -1,0 +1,9 @@
+{
+
+  "reviewsearch": "reviews_Cell_Phones_and_Accessories_5.json",
+
+  "find": {
+    "qa": "qa_Cell_Phones_and_Accessories.json",
+    "review": "reviews_Cell_Phones_and_Accessories_5.json"
+  }
+}
