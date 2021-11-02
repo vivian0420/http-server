@@ -32,6 +32,7 @@ public class ServerResponse {
     public void response(String content) {
         this.output.println("HTTP/1.1 " + this.code);
         this.output.println("content-length: " + content.length());
+        this.output.println("connection: close");
         this.output.println("");
         this.output.println(content);
     }

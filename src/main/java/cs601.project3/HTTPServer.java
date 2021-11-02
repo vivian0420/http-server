@@ -138,12 +138,8 @@ public class HTTPServer {
                 LOGGER.error("500 Internal Server Error", e);
                 response.setCode(500);
                 response.response("<html>500 Internal Server Error</html>");
-
             }
-
-
         }
-
     }
 
     /**
