@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,13 +20,14 @@ import java.util.Map;
 public class HTTPServer {
     private static final Logger LOGGER = LogManager.getLogger(HTTPServer.class.getName());
 
-    private volatile boolean running = true;
+    private volatile boolean running;
     private Map<String, Handler> mapping;
     private ServerSocket serverSocket;
     private int port;
 
     /**
      * Constructor. Specify the the number of port and create serverSocket and a HashMap of mapping.
+     *
      * @param port the number of port that we will listen to
      */
     public HTTPServer(int port) {
@@ -36,11 +38,13 @@ public class HTTPServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.running = true;
     }
 
     /**
      * Add request path and handler to mapping
-     * @param path request path
+     *
+     * @param path    request path
      * @param handler instance of Handler
      */
     public void addMapping(String path, Handler handler) {
@@ -65,14 +69,11 @@ public class HTTPServer {
                 }
                 // start a new thread to handle each socket so that "Each incoming request will be handled by a different thread."
                 new Thread(() -> {
-                    try (BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                         PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true)) {
+                    try (PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true);
+                         BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+                    ) {
                         Map<String, String> headers = new HashMap<>();
                         String requestLine = inStream.readLine();
-                        if(requestLine != null && requestLine.equals("SHUTDOWN_THIS_SERVER")) {
-                            this.shutDown();
-                            return;
-                        }
                         String line = inStream.readLine();
                         while (line != null && !line.trim().isEmpty()) {
                             if (line.contains(":")) {
@@ -82,10 +83,12 @@ public class HTTPServer {
                         }
                         ServerRequest request = new ServerRequest(requestLine, headers, getContent(headers, inStream));
                         ServerResponse response = new ServerResponse(outputStream);
+                        if (request.getRequestMethod() != null && request.getRequestMethod().equals("POST") &&
+                                request.getPath() != null && request.getPath().equals("/shutdown")) {
+                            this.shutDown();
+                            return;
+                        }
                         handleRequest(request, response);
-                        inStream.close();
-                        outputStream.close();
-                        socket.close();
                     } catch (IOException e) {
                         LOGGER.error("Error handing HTTP request.", e);
                     }
@@ -97,8 +100,9 @@ public class HTTPServer {
 
     /**
      * Get HTTP post content
+     *
      * @param headers HTTP header
-     * @param in BufferedReader
+     * @param in      BufferedReader
      * @return post content
      */
     private String getContent(Map<String, String> headers, BufferedReader in) {
@@ -118,26 +122,27 @@ public class HTTPServer {
 
     /**
      * Handle HTTP requests
-     * @param request The HTTP request that the server receives
+     *
+     * @param request  The HTTP request that the server receives
      * @param response The HTTP response that the server sends
      */
     public void handleRequest(ServerRequest request, ServerResponse response) {
         if (request.is400()) {
             response.setCode(400);
-            response.response("<html>400 Bad Request</html>");
+            response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">400 Bad Request</html>");
         } else if (request.is405()) {
             response.setCode(405);
-            response.response("<html>405 Method Not Allowed</html>");
+            response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">405 Method Not Allowed</html>");
         } else if (!this.mapping.containsKey(request.getPath())) {
             response.setCode(404);
-            response.response("<html>404 Not Found</html>");
+            response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">404 Not Found</html>");
         } else {
-            try{
+            try {
                 this.mapping.get(request.getPath()).handle(request, response);
             } catch (Exception e) {
                 LOGGER.error("500 Internal Server Error", e);
                 response.setCode(500);
-                response.response("<html>500 Internal Server Error</html>");
+                response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">500 Internal Server Error</html>");
             }
         }
     }
@@ -147,11 +152,12 @@ public class HTTPServer {
      */
     public void shutDown() {
         this.running = false;
-        try{
+        try {
             this.serverSocket.close();
         } catch (IOException e) {
             LOGGER.error("Unable to close the server socket.", e);
         }
+        System.exit(0);
     }
 
 }

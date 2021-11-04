@@ -32,7 +32,7 @@ public class ChatHandleTest {
     }
 
     @Test
-    public void testHandlePost1() {
+    public void testHandleValidPost() {
         ServerRequest request = new ServerRequest("POST /slackbot HTTP/1.1", null, "message=Hello World");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -46,7 +46,7 @@ public class ChatHandleTest {
     }
 
     @Test
-    public void testHandlePost2() {
+    public void testHandleEmptyPost() {
         ServerRequest request = new ServerRequest("POST /slackbot HTTP/1.1", null, "message=");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -60,7 +60,7 @@ public class ChatHandleTest {
     }
 
     @Test
-    public void testHandlePost3() {
+    public void testHandleBadRequestPost() {
         ServerRequest request = new ServerRequest("POST /slackbot HTTP/1.1", null, "message1=");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);

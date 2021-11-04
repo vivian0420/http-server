@@ -8,12 +8,12 @@ import java.util.Map;
  */
 public class ServerRequest {
 
-    private String requestLine;
-    private Map<String, String> headers;
-    private String content;
-    private String path;
-    private String requestMethod;
-    private String version;
+    final private String requestLine;
+    final private Map<String, String> headers;
+    final private String content;
+    final private String path;
+    final private String requestMethod;
+    final private String version;
 
     /**
      * Constructor. Parse request line
@@ -37,6 +37,10 @@ public class ServerRequest {
                 this.path = null;
                 this.version = null;
             }
+        } else {
+            this.requestMethod = null;
+            this.path = null;
+            this.version = null;
         }
     }
 

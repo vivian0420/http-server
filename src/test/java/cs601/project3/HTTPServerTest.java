@@ -21,7 +21,7 @@ public class HTTPServerTest {
     }
 
     @Test
-    public void testHandleRequest1() {
+    public void testHandleBadRequest1() {
         ServerRequest request = new ServerRequest("get /find HTTP", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -31,7 +31,7 @@ public class HTTPServerTest {
     }
 
     @Test
-    public void testHandleRequest2() {
+    public void testHandleBadRequest2() {
         ServerRequest request = new ServerRequest("GET find HTTP", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -41,7 +41,7 @@ public class HTTPServerTest {
     }
 
     @Test
-    public void testHandleRequest3() {
+    public void testHandleInvalidMethod() {
         ServerRequest request = new ServerRequest("DELETE /find HTTP", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -51,7 +51,7 @@ public class HTTPServerTest {
     }
 
     @Test
-    public void testHandleRequest4() {
+    public void testHandleInvalidPath() {
         ServerRequest request = new ServerRequest("POST /path HTTP", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -61,7 +61,7 @@ public class HTTPServerTest {
     }
 
     @Test
-    public void testHandleRequest5() {
+    public void testHandleMissingContent() {
         ServerRequest request = new ServerRequest("POST /find HTTP/1.1", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);

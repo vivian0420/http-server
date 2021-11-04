@@ -2,6 +2,7 @@ package cs601.project3;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,7 +57,7 @@ public class ReviewSearchHandler implements Handler {
         else if (request.getRequestMethod().equals("POST")) {
             if (request.getContent() == null) {
                 response.setCode(400);
-                response.response("<html>400 Bad Request</html>");
+                response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">400 Bad Request</html>");
                 return;
             }
             String[] contentParts = request.getContent().split("=");
@@ -65,7 +66,7 @@ public class ReviewSearchHandler implements Handler {
             if(!contentParts[0].equals("query"))
             {
                 response.setCode(400);
-                response.response("<html>400 Bad Request</html>");
+                response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">400 Bad Request</html>");
                 return;
             }
             else if (contentParts.length == 1) {
@@ -80,14 +81,14 @@ public class ReviewSearchHandler implements Handler {
 
                     result.append("<p>").append(list.size()).append(" result(s) showed").append("</p>");
                     for (Amazon review : list) {
-                        result.append("<p>").append(review).append("</p>");
+                        result.append("<p>").append(StringEscapeUtils.escapeHtml4(review.toString())).append("</p>");
                     }
                     String content = GetApplicationHTML.getApplicationHTML("reviewsearch", "/reviewsearch",
                             "query", result.toString());
                     response.response(content);
 
                 } else {
-                    result.append("<p>").append(term).append(" is not found").append("</p");
+                    result.append("<p>").append(term).append(" is not found").append("</p>");
                     String content = GetApplicationHTML.getApplicationHTML("reviewsearch", "/reviewsearch",
                             "query", result.toString());
                     response.response(content);

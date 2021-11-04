@@ -7,7 +7,7 @@ import java.io.PrintWriter;
  */
 public class ServerResponse {
     private int code;
-    private PrintWriter output;
+    final private PrintWriter output;
 
     public ServerResponse(PrintWriter output) {
         this.code = 200;
@@ -31,7 +31,8 @@ public class ServerResponse {
      */
     public void response(String content) {
         this.output.println("HTTP/1.1 " + this.code);
-        this.output.println("content-length: " + content.length());
+        this.output.println("content-type: application/xhtml+xml");
+        this.output.println("content-length: " + content.getBytes().length);
         this.output.println("connection: close");
         this.output.println("");
         this.output.println(content);

@@ -2,6 +2,7 @@ package cs601.project3;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -61,14 +61,14 @@ public class FindHandler implements Handler {
             StringBuilder result = new StringBuilder();
             if (request.getContent() == null) {
                 response.setCode(400);
-                response.response("<html>400 Bad Request</html>");
+                response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">400 Bad Request</html>");
                 return;
             }
             String[] contentParts = request.getContent().split("=");
 
             if(!contentParts[0].equals("asin")) {
                 response.setCode(400);
-                response.response("<html>400 Bad Request</html>");
+                response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">400 Bad Request</html>");
                 return;
             }
             else if (contentParts.length == 1) {
@@ -87,24 +87,24 @@ public class FindHandler implements Handler {
                     if (reviewList != null && qaList == null) {
                         result.append("<p>").append(reviewList.size()).append(" result(s) showed").append("</p>");
                         for (Amazon amazon : reviewList) {
-                            result.append("<p>").append(amazon).append("</p>");
+                            result.append("<p>").append(StringEscapeUtils.escapeHtml4(amazon.toString())).append("</p>\n");
                         }
                         String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", result.toString());
                         response.response(content);
                     } else if (reviewList == null && qaList != null) {
                         result.append("<p>").append(qaList.size()).append(" result(s) showed").append("</p>");
                         for (Amazon amazon : qaList) {
-                            result.append("<p>").append(amazon).append("</p>");
+                            result.append("<p>").append(StringEscapeUtils.escapeHtml4(amazon.toString())).append("</p>\n");
                         }
                         String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", result.toString());
                         response.response(content);
                     } else {
                         result.append("<p>").append(reviewList.size() + qaList.size()).append(" result(s) showed").append("</p>");
                         for (Amazon amazon : reviewList) {
-                            result.append("<p>").append(amazon).append("</p>");
+                            result.append("<p>").append(StringEscapeUtils.escapeHtml4(amazon.toString())).append("</p>\n");
                         }
                         for (Amazon amazon : qaList) {
-                            result.append("<p>").append(amazon).append("</p>");
+                            result.append("<p>").append(StringEscapeUtils.escapeHtml4(amazon.toString())).append("</p>\n");
                         }
                         String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", result.toString());
                         response.response(content);

@@ -18,7 +18,7 @@ public class FindHandlerTest {
     }
 
     @Test
-    public void testHandleMethod1() {
+    public void testHandleValidGet() {
         ServerRequest request = new ServerRequest("GET /find HTTP/1.1", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -30,7 +30,7 @@ public class FindHandlerTest {
     }
 
     @Test
-    public void testHandleMethod2() {
+    public void testHandleValidPost() {
         ServerRequest request = new ServerRequest("POST /find HTTP/1.1", null, "asin=3998899561");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -44,7 +44,7 @@ public class FindHandlerTest {
     }
 
     @Test
-    public void testHandleMethod3() {
+    public void testHandleNotFound() {
         ServerRequest request = new ServerRequest("POST /find HTTP/1.1", null, "asin=399889956");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -59,7 +59,7 @@ public class FindHandlerTest {
     }
 
     @Test
-    public void testHandleMethod4() {
+    public void testHandleEmptyTerm() {
         ServerRequest request = new ServerRequest("POST /find HTTP/1.1", null, "asin=");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -73,7 +73,7 @@ public class FindHandlerTest {
     }
 
     @Test
-    public void testHandleMethod5() {
+    public void testHandleBadRequest() {
         ServerRequest request = new ServerRequest("POST /find HTTP/1.1", null, "asin1=3998899561");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);

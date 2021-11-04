@@ -17,7 +17,7 @@ public class SearchHandlerTest {
     }
 
     @Test
-    public void testHandleGet() {
+    public void testHandleValidGet() {
         ServerRequest request = new ServerRequest("GET /reviewsearch HTTP/1.1", null, "");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -29,7 +29,7 @@ public class SearchHandlerTest {
     }
 
     @Test
-    public void testHandlePost1() {
+    public void testHandleValidPost() {
         ServerRequest request = new ServerRequest("POST /reviewsearch HTTP/1.1", null, "query=apple");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -43,7 +43,7 @@ public class SearchHandlerTest {
     }
 
     @Test
-    public void testHandlePost2() {
+    public void testHandleNotFoundPost() {
         ServerRequest request = new ServerRequest("POST /reviewsearch HTTP/1.1", null, "query=appl");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -57,7 +57,7 @@ public class SearchHandlerTest {
     }
 
     @Test
-    public void testHandlePost3() {
+    public void testHandleEmptySearch() {
         ServerRequest request = new ServerRequest("POST /reviewsearch HTTP/1.1", null, "query=");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
@@ -71,7 +71,7 @@ public class SearchHandlerTest {
     }
 
     @Test
-    public void testHandlePost4() {
+    public void testHandleBadRequest() {
         ServerRequest request = new ServerRequest("POST /reviewsearch HTTP/1.1", null, "query1=");
         StringWriter writer = new StringWriter();
         PrintWriter out = new PrintWriter(writer);
