@@ -1,16 +1,7 @@
 package cs601.project3;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import org.apache.commons.text.StringEscapeUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -19,25 +10,16 @@ import java.util.Map;
  */
 public class FindHandler implements Handler {
 
-    private static final Logger LOGGER = LogManager.getLogger(FindHandler.class.getName());
 
     private final Map<String, List<Amazon>> reviewAsinMap;
     private final Map<String, List<Amazon>> qaAsinMap;
-    private JsonObject json;
 
     /**
      * Constructor. Read files and build asin hashmaps.
      */
-    public FindHandler() {
-
-
-        try (BufferedReader br = Files.newBufferedReader(Paths.get("config.json"), StandardCharsets.ISO_8859_1)) {
-            json = new Gson().fromJson(br, JsonObject.class);
-        } catch (IOException e) {
-            LOGGER.error("Config can't be found, ", e);
-        }
-        reviewAsinMap = new ReadFile(json.get("find").getAsJsonObject().get("review").getAsString()).readFile(AmazonReview.class);
-        qaAsinMap = new ReadFile(json.get("find").getAsJsonObject().get("qa").getAsString()).readFile(AmazonQA.class);
+    public FindHandler(Map<String, List<Amazon>> reviewAsinMap, Map<String, List<Amazon>> qaAsinMap) {
+        this.reviewAsinMap = reviewAsinMap;
+        this.qaAsinMap = qaAsinMap;
     }
 
 
@@ -66,12 +48,10 @@ public class FindHandler implements Handler {
             }
             String[] contentParts = request.getContent().split("=");
 
-            if(!contentParts[0].equals("asin")) {
+            if (!contentParts[0].equals("asin")) {
                 response.setCode(400);
                 response.response("<html xmlns=\"http://www.w3.org/1999/xhtml\">400 Bad Request</html>");
-                return;
-            }
-            else if (contentParts.length == 1) {
+            } else if (contentParts.length == 1) {
                 String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", "Please enter");
                 response.response(content);
             } else if (contentParts.length == 2) {
@@ -108,7 +88,6 @@ public class FindHandler implements Handler {
                         }
                         String content = GetApplicationHTML.getApplicationHTML("find", "/find", "asin", result.toString());
                         response.response(content);
-
                     }
                 }
             }

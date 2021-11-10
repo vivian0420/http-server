@@ -1,12 +1,23 @@
 package cs601.project3;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,12 +25,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SearchApplicationTest {
     private static HTTPServer server;
     private final static int PORT = 8420;
-
+    private static final Logger LOGGER = LogManager.getLogger(FindHandler.class.getName());
+    private static JsonObject json;
     @BeforeAll
     public static void startApplication() {
         server = new HTTPServer(PORT);
-        server.addMapping("/reviewsearch", new ReviewSearchHandler());
-        server.addMapping("/find", new FindHandler());
+        try (BufferedReader br = Files.newBufferedReader(Paths.get("config.json"), StandardCharsets.ISO_8859_1)) {
+            json = new Gson().fromJson(br, JsonObject.class);
+        } catch (IOException e) {
+            LOGGER.error("Config can't be found, ", e);
+        }
+        Map<String, List<Amazon>> reviewAsinMap = new ReadFile(json.get("find").getAsJsonObject().get("review").getAsString()).readFile(AmazonReview.class);
+        Map<String, List<Amazon>>qaAsinMap = new ReadFile(json.get("find").getAsJsonObject().get("qa").getAsString()).readFile(AmazonQA.class);
+        server.addMapping("/reviewsearch", new ReviewSearchHandler(reviewAsinMap));
+        server.addMapping("/find", new FindHandler(reviewAsinMap, qaAsinMap));
         server.startup();
     }
 

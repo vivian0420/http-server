@@ -26,15 +26,9 @@ public class ReviewSearchHandler implements Handler {
     /**
      * Constructor. Read files and build asin hashmap.
      */
-    public ReviewSearchHandler() {
-        try (BufferedReader br = Files.newBufferedReader(Paths.get("config.json"), StandardCharsets.ISO_8859_1)) {
-            json = new Gson().fromJson(br, JsonObject.class);
-        } catch (IOException e) {
-            LOGGER.error("Config can't be found, ", e);
-        }
+    public ReviewSearchHandler(Map<String, List<Amazon>> reviewAsinMap) {
 
-        Map<String, List<Amazon>> asinMap = new ReadFile(json.get("reviewsearch").getAsString()).readFile(AmazonReview.class);
-        this.index = new InvertedIndex<>(asinMap);
+        this.index = new InvertedIndex<>(reviewAsinMap);
     }
 
     /**
