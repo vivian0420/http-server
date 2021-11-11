@@ -12,6 +12,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -19,7 +21,7 @@ import java.util.Map;
  */
 public class HTTPServer {
     private static final Logger LOGGER = LogManager.getLogger(HTTPServer.class.getName());
-
+    final private ExecutorService executorService;
     private volatile boolean running;
     private Map<String, Handler> mapping;
     private ServerSocket serverSocket;
@@ -39,6 +41,7 @@ public class HTTPServer {
             e.printStackTrace();
         }
         this.running = true;
+        this.executorService = Executors.newFixedThreadPool(10);
     }
 
     /**
@@ -68,7 +71,7 @@ public class HTTPServer {
                     continue;
                 }
                 // start a new thread to handle each socket so that "Each incoming request will be handled by a different thread."
-                new Thread(() -> {
+                this.executorService.execute(() -> {
                     try (PrintWriter outputStream = new PrintWriter(socket.getOutputStream(), true);
                          BufferedReader inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()))
                     ) {
@@ -92,7 +95,7 @@ public class HTTPServer {
                     } catch (IOException e) {
                         LOGGER.error("Error handing HTTP request.", e);
                     }
-                }).start();
+                });
             }
         }).start();
         LOGGER.info("Server started at http://localhost:" + this.port);

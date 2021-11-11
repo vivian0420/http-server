@@ -3,9 +3,9 @@ package cs601.project3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Building inverted index,and support searching
@@ -23,7 +23,7 @@ public class InvertedIndex<T> {
      * @param map reviewAsin or qaAsin HashMap
      */
     public InvertedIndex(Map<String, List<T>> map) {
-        this.index = new HashMap<>();
+        this.index = new ConcurrentHashMap<>();
         this.documentID = new ArrayList<>();
         buildIndex(map);
 
